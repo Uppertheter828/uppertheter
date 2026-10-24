@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+:root {
+  --bg-dark: #07090e;
+  --card-bg: #0d131f;
+  --border-bg: #1f293d;
+  --emerald-main: #10b981;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-dark) !important;
+  color: #ffffff !important;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.ut-card {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border-bg) !important;
+  border-radius: 20px !important;
+}
+
+.ut-btn-green {
+  background-color: var(--emerald-main) !important;
+  color: #000000 !important;
+  font-weight: 800 !important;
+  border-radius: 12px !important;
+  border: none !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ut-btn-green:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
