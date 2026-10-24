@@ -23,7 +23,12 @@ export default function PassivePoolPage() {
   const [connected, setConnected] = useState(false);
   const [registered, setRegistered] = useState(false);
   const [info, setInfo] = useState<{ regTime: number; hasReferral: boolean; staked: boolean } | null>(null);
-  const [now, setNow] = useState(Math.floor(Date.now() / 1000));
+  const [now, setNow] = useState(0);
+
+useEffect(() => {
+  setNow(Math.floor(Date.now() / 1000));
+  // agar har second update karna hai toh setInterval bhi laga sakta hai
+}, []);
 
   useEffect(() => {
     setMounted(true);
