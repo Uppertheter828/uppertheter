@@ -41,9 +41,10 @@ export default function MatrixPlanPage() {
         return;
       }
 
+      // Exact Time Calculations for Today and Yesterday (in Seconds)
       const now = new Date();
       const startOfTodaySec = Math.floor(new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0).getTime() / 1000);
-      const startOfYesterdaySec = startOfTodaySec - 86400;
+      const startOfYesterdaySec = startOfTodaySec - 86400; // 24 hours back
 
       let tCount = 0;
       let yCount = 0;
@@ -52,17 +53,22 @@ export default function MatrixPlanPage() {
         try {
           const addr = await contract.userList(i);
           const uData = await contract.users(addr);
+          
+          // Accessing registrationTime from the tuple/struct array index [3] or named property
           const regTimestamp = Number(uData.registrationTime || uData[3] || 0);
           
           if (regTimestamp > 0) {
+            // Today Users (Aaj raat 12:00 AM se abhi tak)
             if (regTimestamp >= startOfTodaySec) {
               tCount++;
-            } else if (regTimestamp >= startOfYesterdaySec && regTimestamp < startOfTodaySec) {
+            } 
+            // Yesterday Users (Kal raat 12:00 AM se aaj raat 12:00 AM tak - poore 24 hours)
+            else if (regTimestamp >= startOfYesterdaySec && regTimestamp < startOfTodaySec) {
               yCount++;
             }
           }
         } catch (err) {
-          console.log(`Error reading user at index ${i}:`, err);
+          // Silent catch to keep loop smooth
         }
       }
 
