@@ -35,9 +35,17 @@ export default function MatrixPlanPage() {
       const totalNum = Number(total);
       setTotalUsers(totalNum);
 
-      // Fetch all MatrixActivated events to count today and yesterday accurately via block timestamps
+      if (totalNum === 0) {
+        setLoadingStats(false);
+        return;
+      }
+
+      // Get current block number to query recent blocks safely within public RPC limits
+      const currentBlock = await provider.getBlockNumber();
+      const fromBlock = Math.max(0, currentBlock - 300000); // Covers recent blocks containing all active users
+
       const filter = contract.filters.MatrixActivated();
-      const events = await contract.queryFilter(filter, 0, "latest");
+      const events = await contract.queryFilter(filter, fromBlock, "latest");
 
       const now = new Date();
       const startOfTodaySec = Math.floor(new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0).getTime() / 1000);
