@@ -7,8 +7,7 @@ import { ethers } from "ethers";
 const CONTRACT_ADDRESS = "0x2763371176919176e28EC6B92bAc01875b9Bb2F3";
 const CONTRACT_ABI = [
   "function getTotalUsers() external view returns (uint256)",
-  "function userList(uint256) external view returns (address)",
-  "function users(address) external view returns (address referrer, address[3] seniors, bool isRegistered, uint256 registrationTime, uint256 directReferralsCount)"
+  "event MatrixActivated(address indexed user, address indexed referrer)"
 ];
 
 export default function MatrixPlanPage() {
@@ -36,40 +35,29 @@ export default function MatrixPlanPage() {
       const totalNum = Number(total);
       setTotalUsers(totalNum);
 
-      if (totalNum === 0) {
-        setLoadingStats(false);
-        return;
-      }
+      // Fetch all MatrixActivated events to count today and yesterday accurately via block timestamps
+      const filter = contract.filters.MatrixActivated();
+      const events = await contract.queryFilter(filter, 0, "latest");
 
-      // Exact Time Calculations for Today and Yesterday (in Seconds)
       const now = new Date();
       const startOfTodaySec = Math.floor(new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0).getTime() / 1000);
-      const startOfYesterdaySec = startOfTodaySec - 86400; // 24 hours back
+      const startOfYesterdaySec = startOfTodaySec - 86400;
 
       let tCount = 0;
       let yCount = 0;
 
-      for (let i = 0; i < totalNum; i++) {
+      for (const event of events) {
         try {
-          const addr = await contract.userList(i);
-          const uData = await contract.users(addr);
-          
-          // Accessing registrationTime from the tuple/struct array index [3] or named property
-          const regTimestamp = Number(uData.registrationTime || uData[3] || 0);
-          
-          if (regTimestamp > 0) {
-            // Today Users (Aaj raat 12:00 AM se abhi tak)
-            if (regTimestamp >= startOfTodaySec) {
+          const block = await provider.getBlock(event.blockNumber);
+          if (block && block.timestamp) {
+            const ts = Number(block.timestamp);
+            if (ts >= startOfTodaySec) {
               tCount++;
-            } 
-            // Yesterday Users (Kal raat 12:00 AM se aaj raat 12:00 AM tak - poore 24 hours)
-            else if (regTimestamp >= startOfYesterdaySec && regTimestamp < startOfTodaySec) {
+            } else if (ts >= startOfYesterdaySec && ts < startOfTodaySec) {
               yCount++;
             }
           }
-        } catch (err) {
-          // Silent catch to keep loop smooth
-        }
+        } catch (e) {}
       }
 
       setTodayActivations(tCount);
