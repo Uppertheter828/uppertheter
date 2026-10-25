@@ -42,11 +42,8 @@ export default function MatrixPlanPage() {
       }
 
       const now = new Date();
-      const todayString = now.toDateString();
-      
-      const yesterday = new Date();
-      yesterday.setDate(now.getDate() - 1);
-      const yesterdayString = yesterday.toDateString();
+      const startOfTodaySec = Math.floor(new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0).getTime() / 1000);
+      const startOfYesterdaySec = startOfTodaySec - 86400;
 
       let tCount = 0;
       let yCount = 0;
@@ -55,13 +52,12 @@ export default function MatrixPlanPage() {
         try {
           const addr = await contract.userList(i);
           const uData = await contract.users(addr);
-          const regTimestamp = Number(uData.registrationTime || uData[3] || 0) * 1000;
+          const regTimestamp = Number(uData.registrationTime || uData[3] || 0);
           
           if (regTimestamp > 0) {
-            const regDate = new Date(regTimestamp).toDateString();
-            if (regDate === todayString) {
+            if (regTimestamp >= startOfTodaySec) {
               tCount++;
-            } else if (regDate === yesterdayString) {
+            } else if (regTimestamp >= startOfYesterdaySec && regTimestamp < startOfTodaySec) {
               yCount++;
             }
           }
