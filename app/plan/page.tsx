@@ -41,15 +41,15 @@ export default function MatrixPlanPage() {
       }
 
       const currentBlock = await provider.getBlockNumber();
-      // BscScan ke hisab se saare recent events cover karne ke liye 400,000 blocks scan karenge
-      const fromBlock = Math.max(0, currentBlock - 400000);
+      // BSC par pichle 48 ghante (60,000 blocks) ke events safely fetch karne ke liye
+      const fromBlock = Math.max(0, currentBlock - 60000);
 
       const filter = contract.filters.MatrixActivated();
       const events = await contract.queryFilter(filter, fromBlock, "latest");
 
-      const nowSec = Math.floor(Date.now() / 1000);
-      const startOfTodaySec = nowSec - (nowSec % 86400); // Aaj raat 12:00 AM
-      const startOfYesterdaySec = startOfTodaySec - 86400; // Kal raat 12:00 AM
+      const now = new Date();
+      const startOfTodaySec = Math.floor(new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0).getTime() / 1000);
+      const startOfYesterdaySec = startOfTodaySec - 86400;
 
       let tCount = 0;
       let yCount = 0;
@@ -68,13 +68,10 @@ export default function MatrixPlanPage() {
         } catch (e) {}
       }
 
-      // Fallback agar RPC limit ki wajah se events na aayein toh BscScan ka exact live data match kare
-      setTodayActivations(tCount > 0 ? tCount : 15);
-      setYesterdayActivations(yCount > 0 ? yCount : 13);
+      setTodayActivations(tCount);
+      setYesterdayActivations(yCount);
     } catch (err) {
       console.error("Error fetching blockchain data:", err);
-      setTodayActivations(15);
-      setYesterdayActivations(13);
     } finally {
       setLoadingStats(false);
     }
@@ -188,7 +185,7 @@ export default function MatrixPlanPage() {
               <h3 style={{ fontSize: "16px", fontWeight: "900", color: "#10b981", margin: 0 }}>Important Protocol Note & Passive Switch Rule</h3>
             </div>
             <p style={{ fontSize: "13px", color: "#d1d5db", lineHeight: "1.7", margin: 0 }}>
-              If a user activates the $50 tier package but fails to refer at least one direct member or participate in staking within <strong style={{ color: "#ffffff" }}>60 days</strong>, their account/ID will automatically switch into the <strong style={{ color: "#ffffff" }}>Passive Pool</strong>. Starting from the 60th day onwards, their token minting process will initiate, and a total of <strong style={{ color: "#10b981" }}>$60 USDT</strong> will be successfully minted and automatically credited back to their connected wallet over a period of <strong style={{ color: "#ffffff" }}>150 days</strong>.
+              If a user activates the $50 tier package but fails to refer at least one direct member or participate in staking within <strong style={{ color: "#ffffff" }}>60 days</strong>, their account/ID will automatically switch into the <strong style={{ color: "#ffffff" }}>Passive Pool</strong>. Starting from the 60th day onwards, their token minting process will initiate, and a total of <strong style={{ color: "#10b981" }}>$60 USDT</strong> will be successfully minted and automatically credited back to their connected wallet over a period of <strong style={{ color: "#ffffff" }}>150 days</strong>[cite: 13].
             </p>
           </div>
 
