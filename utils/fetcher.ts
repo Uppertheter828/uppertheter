@@ -14,13 +14,11 @@ export async function getRealUserData(walletAddress: string, provider: any, stak
     let todayUsersCount = 0;
     let yesterdayUsersCount = 0;
 
-    // Time calculations for Today and Yesterday (Seconds)
+    // Rolling 24-hour time calculations (Seconds)
     const nowSec = Math.floor(Date.now() / 1000);
-    const nowDate = new Date();
-    const startOfTodaySec = Math.floor(new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), 0, 0, 0, 0).getTime() / 1000);
-    const startOfYesterdaySec = startOfTodaySec - 86400; // 24 hours back
+    const last24HoursSec = nowSec - 86400;     // Pichle 24 ghante (Today)
+    const prev24HoursSec = nowSec - 172800;    // Uske pichle 24 ghante (Yesterday)
 
-    // 1. Smart contract se users ki list scan karke team aur daily counts nikalna
     try {
       const totalUsers = await stakingContract.getTotalUsers();
       const totalNum = Number(totalUsers);
@@ -37,7 +35,6 @@ export async function getRealUserData(walletAddress: string, provider: any, stak
           allUsersMap[addr.toLowerCase()] = ref.toLowerCase();
           userListArray.push(addr.toLowerCase());
 
-          // Directs count
           if (ref.toLowerCase() === walletAddress.toLowerCase()) {
             directs++;
             directAddresses.push(addr.toLowerCase());
@@ -45,10 +42,10 @@ export async function getRealUserData(walletAddress: string, provider: any, stak
         } catch (e) {}
       }
 
-      // Fetch MatrixActivated events to accurately calculate Today and Yesterday user counts based on block timestamps
+      // Fetch MatrixActivated events for rolling 24 hours calculation
       try {
         const currentBlock = await provider.getBlockNumber();
-        const fromBlock = Math.max(0, currentBlock - 100000); // Safe block window for public RPC
+        const fromBlock = Math.max(0, currentBlock - 100000);
         const filter = stakingContract.filters.MatrixActivated();
         const events = await stakingContract.queryFilter(filter, fromBlock, "latest");
 
@@ -57,19 +54,18 @@ export async function getRealUserData(walletAddress: string, provider: any, stak
             const block = await provider.getBlock(event.blockNumber);
             if (block && block.timestamp) {
               const ts = Number(block.timestamp);
-              if (ts >= startOfTodaySec) {
+              if (ts >= last24HoursSec) {
                 todayUsersCount++;
-              } else if (ts >= startOfYesterdaySec && ts < startOfTodaySec) {
+              } else if (ts >= prev24HoursSec && ts < last24HoursSec) {
                 yesterdayUsersCount++;
               }
             }
           } catch (e) {}
         }
       } catch (evtErr) {
-        console.log("Event query fallback error:", evtErr);
+        console.log("Event query error:", evtErr);
       }
 
-      // Level 2 calculation
       userListArray.forEach((addr) => {
         const ref = allUsersMap[addr];
         if (ref && directAddresses.includes(ref)) {
@@ -77,21 +73,11 @@ export async function getRealUserData(walletAddress: string, provider: any, stak
         }
       });
 
-      // Owner fallback check
       if (directs === 0 && walletAddress.toLowerCase() === MASTER_OWNER.toLowerCase()) {
         directs = 3;
       }
     } catch (err) {
       console.log("Team network fetch error:", err);
-      try {
-        const filter = stakingContract.filters.MatrixActivated(null, walletAddress);
-        const events = await stakingContract.queryFilter(filter, 0, "latest");
-        directs = events.length;
-      } catch (e) {}
-    }
-
-    if (directs === 0 && walletAddress.toLowerCase() === MASTER_OWNER.toLowerCase()) {
-      directs = 3;
     }
 
     const directCommissionNum = directs * 20;
@@ -157,8 +143,8 @@ export async function getRealUserData(walletAddress: string, provider: any, stak
       level2Count,
       level3Count,
       level4Count,
-      todayUsers: todayUsersCount > 0 ? todayUsersCount : 2,         // Fallback to active count if RPC throttles
-      yesterdayUsers: yesterdayUsersCount > 0 ? yesterdayUsersCount : 3, // Fallback to active count
+      todayUsers: todayUsersCount,
+      yesterdayUsers: yesterdayUsersCount,
       directCommission: directCommissionNum.toFixed(2),
       matrixIncome: matrixIncomeNum.toFixed(2),
       vaults,
