@@ -41,14 +41,14 @@ export default function MatrixPlanPage() {
       }
 
       const currentBlock = await provider.getBlockNumber();
-      const fromBlock = Math.max(0, currentBlock - 100000); // Safe block window for public RPC
+      const fromBlock = Math.max(0, currentBlock - 100000);
 
       const filter = contract.filters.MatrixActivated();
       const events = await contract.queryFilter(filter, fromBlock, "latest");
 
-      const now = new Date();
-      const startOfTodaySec = Math.floor(new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0).getTime() / 1000);
-      const startOfYesterdaySec = startOfTodaySec - 86400;
+      const nowSec = Math.floor(Date.now() / 1000);
+      const last24HoursSec = nowSec - 86400;     // Pichle 24 ghante (Today)
+      const prev24HoursSec = nowSec - 172800;    // Uske pichle 24 ghante (Yesterday)
 
       let tCount = 0;
       let yCount = 0;
@@ -58,21 +58,19 @@ export default function MatrixPlanPage() {
           const block = await provider.getBlock(event.blockNumber);
           if (block && block.timestamp) {
             const ts = Number(block.timestamp);
-            if (ts >= startOfTodaySec) {
+            if (ts >= last24HoursSec) {
               tCount++;
-            } else if (ts >= startOfYesterdaySec && ts < startOfTodaySec) {
+            } else if (ts >= prev24HoursSec && ts < last24HoursSec) {
               yCount++;
             }
           }
         } catch (e) {}
       }
 
-      setTodayActivations(tCount > 0 ? tCount : 2);
-      setYesterdayActivations(yCount > 0 ? yCount : 3);
+      setTodayActivations(tCount);
+      setYesterdayActivations(yCount);
     } catch (err) {
       console.error("Error fetching blockchain data:", err);
-      setTodayActivations(2);
-      setYesterdayActivations(3);
     } finally {
       setLoadingStats(false);
     }
