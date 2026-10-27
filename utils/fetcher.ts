@@ -148,8 +148,8 @@ export async function getRealUserData(walletAddress: string, provider: any, stak
       level2Count,
       level3Count,
       level4Count,
-      todayUsers: todayUsersCount > 0 ? todayUsersCount : 15,         // Safe fallback if RPC throttles
-      yesterdayUsers: yesterdayUsersCount > 0 ? yesterdayUsersCount : 13, // Safe fallback
+      todayUsers: todayUsersCount,
+      yesterdayUsers: yesterdayUsersCount,
       directCommission: directCommissionNum.toFixed(2),
       matrixIncome: matrixIncomeNum.toFixed(2),
       vaults,

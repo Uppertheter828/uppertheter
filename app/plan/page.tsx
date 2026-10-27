@@ -26,7 +26,6 @@ export default function MatrixPlanPage() {
       if (typeof window !== "undefined" && (window as any).ethereum) {
         provider = new ethers.BrowserProvider((window as any).ethereum);
       } else {
-        // Fast and reliable public BSC RPC node to prevent query timeouts
         provider = new ethers.JsonRpcProvider("https://bsc-rpc.publicnode.com");
       }
 
@@ -42,7 +41,6 @@ export default function MatrixPlanPage() {
       }
 
       const currentBlock = await provider.getBlockNumber();
-      // Safe block range for fast RPC querying
       const fromBlock = Math.max(0, currentBlock - 50000);
 
       const filter = contract.filters.MatrixActivated();
@@ -69,13 +67,13 @@ export default function MatrixPlanPage() {
         } catch (e) {}
       }
 
-      // Live count agar events se mile toh wahi, nahi toh contract growth ke mutabiq exact live fallback
-      setTodayActivations(tCount > 0 ? tCount : 15);
-      setYesterdayActivations(yCount > 0 ? yCount : 13);
+      // Strictly real data without any fake fallback numbers
+      setTodayActivations(tCount);
+      setYesterdayActivations(yCount);
     } catch (err) {
       console.error("Error fetching blockchain data:", err);
-      setTodayActivations(15);
-      setYesterdayActivations(13);
+      setTodayActivations(0);
+      setYesterdayActivations(0);
     } finally {
       setLoadingStats(false);
     }
