@@ -43,9 +43,9 @@ export default function MatrixPlanPage() {
       const currentBlock = await provider.getBlockNumber();
       const filter = contract.filters.MatrixActivated();
       
-      // Public RPC limits se bachne ke liye pichle 40,000 blocks ko 5,000 ke chunks mein query karenge
+      // Poore 48-50 ghante (Yesterday + Today) cover karne ke liye 70,000 blocks scan karenge
       let events: any[] = [];
-      const totalBlocksToScan = 40000;
+      const totalBlocksToScan = 70000;
       const chunkSize = 5000;
       
       for (let start = Math.max(0, currentBlock - totalBlocksToScan); start < currentBlock; start += chunkSize) {
@@ -53,9 +53,7 @@ export default function MatrixPlanPage() {
         try {
           const chunkEvents = await contract.queryFilter(filter, start, end);
           events.push(...chunkEvents);
-        } catch (chunkErr) {
-          console.log(`Chunk error between ${start} and ${end}:`, chunkErr);
-        }
+        } catch (chunkErr) {}
       }
 
       const nowSec = Math.floor(Date.now() / 1000);
@@ -134,7 +132,7 @@ export default function MatrixPlanPage() {
               <div style={{ fontSize: "10px", color: "#10b981", fontWeight: "700" }}>Active Today</div>
             </div>
 
-            <div style={{ backgroundColor: "#0d131f", border: "1px solid rgba(16, 185, 129, 0.2)", borderRadius: "20px", padding: "20px", textAlign: "center" }}>
+            <div style={{ backgroundColor: "#0d131f", border: "1px solid rgba(16, 185, 129, 0.2)",borderRadius: "20px", padding: "20px", textAlign: "center" }}>
               <div style={{ fontSize: "11px", color: "#9ca3af", fontWeight: "800", textTransform: "uppercase" }}>Yesterday's Activations</div>
               <div style={{ fontSize: "28px", fontWeight: "900", color: "#ffffff", margin: "8px 0 4px 0" }}>
                 {loadingStats ? "..." : `+${yesterdayActivations}`}
