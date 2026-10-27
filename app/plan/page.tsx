@@ -41,14 +41,14 @@ export default function MatrixPlanPage() {
       }
 
       const currentBlock = await provider.getBlockNumber();
-      const fromBlock = Math.max(0, currentBlock - 50000);
+      const fromBlock = Math.max(0, currentBlock - 500000);
 
       const filter = contract.filters.MatrixActivated();
       const events = await contract.queryFilter(filter, fromBlock, "latest");
 
       const nowSec = Math.floor(Date.now() / 1000);
-      const last24HoursSec = nowSec - 86400;     // Pichle 24 ghante (Today)
-      const prev24HoursSec = nowSec - 172800;    // Uske pichle 24 ghante (Yesterday)
+      const last24HoursSec = nowSec - 86400;     
+      const prev24HoursSec = nowSec - 172800;    
 
       let tCount = 0;
       let yCount = 0;
@@ -67,13 +67,10 @@ export default function MatrixPlanPage() {
         } catch (e) {}
       }
 
-      // Strictly real data without any fake fallback numbers
       setTodayActivations(tCount);
       setYesterdayActivations(yCount);
     } catch (err) {
       console.error("Error fetching blockchain data:", err);
-      setTodayActivations(0);
-      setYesterdayActivations(0);
     } finally {
       setLoadingStats(false);
     }
