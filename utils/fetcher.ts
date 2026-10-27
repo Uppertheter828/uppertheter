@@ -4,7 +4,12 @@ const MASTER_OWNER = "0x984Fcc48E2DAffc6e4E1CB1685aeF1aEfA698555";
 
 export async function getRealUserData(walletAddress: string, provider: any, stakingAddress: string, abi: any) {
   try {
-    const stakingContract = new ethers.Contract(stakingAddress, abi, provider);
+    let activeProvider = provider;
+    if (!activeProvider) {
+      activeProvider = new ethers.JsonRpcProvider("https://bsc-dataseed1.binance.org/");
+    }
+
+    const stakingContract = new ethers.Contract(stakingAddress, abi, activeProvider);
     
     let directs = 0;
     let level2Count = 0;
@@ -12,15 +17,10 @@ export async function getRealUserData(walletAddress: string, provider: any, stak
     let level4Count = 0;
     let directAddresses: string[] = [];
     let todayUsersCount = 0;
-    let yesterdayUsersCount = 0;
 
-    // Time calculations for Today and Yesterday (Seconds)
     const nowSec = Math.floor(Date.now() / 1000);
-    const nowDate = new Date();
-    const startOfTodaySec = Math.floor(new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), 0, 0, 0, 0).getTime() / 1000);
-    const startOfYesterdaySec = startOfTodaySec - 86400; // 24 hours back
+    const startOfTodaySec = nowSec - (nowSec % 86400); // Aaj raat 12:00 AM se abhi tak
 
-    // 1. Smart contract se users ki list scan karke team aur daily counts nikalna
     try {
       const totalUsers = await stakingContract.getTotalUsers();
       const totalNum = Number(totalUsers);
@@ -34,31 +34,46 @@ export async function getRealUserData(walletAddress: string, provider: any, stak
           const uData = await stakingContract.users(addr);
           const ref = uData.referrer || uData[0];
           
-          // Smart contract se user ka registration time (agr uData mein timestamp field ho)
-          const joinedTime = Number(uData.joinedAt || uData.createdAt || uData.time || uData[2] || 0);
-
           allUsersMap[addr.toLowerCase()] = ref.toLowerCase();
           userListArray.push(addr.toLowerCase());
 
-          // Directs count
           if (ref.toLowerCase() === walletAddress.toLowerCase()) {
             directs++;
             directAddresses.push(addr.toLowerCase());
           }
-
-          // Today Users (Aaj raat 12:00 AM se abhi tak)
-          if (joinedTime >= startOfTodaySec) {
-            todayUsersCount++;
-          }
-
-          // Yesterday Users (Kal raat 12:00 AM se aaj raat 12:00 AM tak - poore 24 hours)
-          if (joinedTime >= startOfYesterdaySec && joinedTime < startOfTodaySec) {
-            yesterdayUsersCount++;
-          }
         } catch (e) {}
       }
 
-      // Level 2 calculation
+      // MatrixActivated events se exact today activations nikalna
+      try {
+        const currentBlock = await activeProvider.getBlockNumber();
+        const filter = stakingContract.filters.MatrixActivated();
+        
+        let events: any[] = [];
+        const totalBlocksToScan = 400000;
+        const chunkSize = 5000;
+        
+        for (let start = Math.max(0, currentBlock - totalBlocksToScan); start < currentBlock; start += chunkSize) {
+          const end = Math.min(start + chunkSize, currentBlock);
+          try {
+            const chunkEvents = await stakingContract.queryFilter(filter, start, end);
+            events.push(...chunkEvents);
+          } catch (chunkErr) {}
+        }
+
+        for (const event of events) {
+          try {
+            const block = await activeProvider.getBlock(event.blockNumber);
+            if (block && block.timestamp) {
+              const ts = Number(block.timestamp);
+              if (ts >= startOfTodaySec) {
+                todayUsersCount++;
+              }
+            }
+          } catch (e) {}
+        }
+      } catch (evtErr) {}
+
       userListArray.forEach((addr) => {
         const ref = allUsersMap[addr];
         if (ref && directAddresses.includes(ref)) {
@@ -66,21 +81,11 @@ export async function getRealUserData(walletAddress: string, provider: any, stak
         }
       });
 
-      // Owner fallback check
       if (directs === 0 && walletAddress.toLowerCase() === MASTER_OWNER.toLowerCase()) {
         directs = 3;
       }
     } catch (err) {
       console.log("Team network fetch error:", err);
-      try {
-        const filter = stakingContract.filters.MatrixActivated(null, walletAddress);
-        const events = await stakingContract.queryFilter(filter, 0, "latest");
-        directs = events.length;
-      } catch (e) {}
-    }
-
-    if (directs === 0 && walletAddress.toLowerCase() === MASTER_OWNER.toLowerCase()) {
-      directs = 3;
     }
 
     const directCommissionNum = directs * 20;
@@ -146,8 +151,8 @@ export async function getRealUserData(walletAddress: string, provider: any, stak
       level2Count,
       level3Count,
       level4Count,
-      todayUsers: todayUsersCount,          // <--- Aaj ka count
-      yesterdayUsers: yesterdayUsersCount,   // <--- Kal ka count
+      todayUsers: todayUsersCount > 0 ? todayUsersCount : 0, 
+      yesterdayUsers: 0,
       directCommission: directCommissionNum.toFixed(2),
       matrixIncome: matrixIncomeNum.toFixed(2),
       vaults,

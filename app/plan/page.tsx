@@ -62,10 +62,10 @@ export default function MatrixPlanPage() {
         } catch (e) {}
       }
 
-      setTodayActivations(tCount > 0 ? tCount : 15);
+      setTodayActivations(tCount);
     } catch (err) {
       console.error("Error fetching blockchain data:", err);
-      setTodayActivations(15);
+      setTodayActivations(0);
     } finally {
       setLoadingStats(false);
     }
@@ -151,28 +151,11 @@ export default function MatrixPlanPage() {
                 <div style={{ fontSize: "13px", color: "#d1d5db", display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#030712", padding: "12px 16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.04)" }}>
                   <span style={{ color: "#10b981", fontWeight: "900" }}>✓</span> 15% 3 Level Senior ($7.50 USDT)
                 </div>
-                <div style={{ fontSize: "13px", color: "#d1d5db", display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#030712", padding: "12px 16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.04)" }}>
+                <div style={{ fontSize: "13px", color: "#10b981", fontWeight: "900", display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#030712", padding: "12px 16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.04)" }}>
                   <span style={{ color: "#10b981", fontWeight: "900" }}>✓</span> 5% Maintenance Fees ($2.50 USDT)
                 </div>
               </div>
             </div>
-          </div>
-
-          <div style={{
-            backgroundColor: "rgba(16, 185, 129, 0.08)",
-            border: "1px solid rgba(16, 185, 129, 0.4)",
-            borderRadius: "20px",
-            padding: "24px 28px",
-            textAlign: "left",
-            boxShadow: "0 10px 30px rgba(16, 185, 129, 0.1)"
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
-              <span style={{ fontSize: "20px" }}>💡</span>
-              <h3 style={{ fontSize: "16px", fontWeight: "900", color: "#10b981", margin: 0 }}>Important Protocol Note & Passive Switch Rule</h3>
-            </div>
-            <p style={{ fontSize: "13px", color: "#d1d5db", lineHeight: "1.7", margin: 0 }}>
-              If a user activates the $50 tier package but fails to refer at least one direct member or participate in staking within <strong style={{ color: "#ffffff" }}>60 days</strong>, their account/ID will automatically switch into the <strong style={{ color: "#ffffff" }}>Passive Pool</strong>. Starting from the 60th day onwards, their token minting process will initiate, and a total of <strong style={{ color: "#10b981" }}>$60 USDT</strong> will be successfully minted and automatically credited back to their connected wallet over a period of <strong style={{ color: "#ffffff" }}>150 days</strong>[cite: 13].
-            </p>
           </div>
 
         </div>
