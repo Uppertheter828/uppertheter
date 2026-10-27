@@ -47,12 +47,22 @@ export async function getRealUserData(walletAddress: string, provider: any, stak
         } catch (e) {}
       }
 
-      // Fetch MatrixActivated events safely using fast RPC
+      // Fetch MatrixActivated events safely using chunked block queries to prevent RPC timeouts
       try {
         const currentBlock = await activeProvider.getBlockNumber();
-        const fromBlock = Math.max(0, currentBlock - 50000);
         const filter = stakingContract.filters.MatrixActivated();
-        const events = await stakingContract.queryFilter(filter, fromBlock, "latest");
+        
+        let events: any[] = [];
+        const totalBlocksToScan = 40000;
+        const chunkSize = 5000;
+        
+        for (let start = Math.max(0, currentBlock - totalBlocksToScan); start < currentBlock; start += chunkSize) {
+          const end = Math.min(start + chunkSize, currentBlock);
+          try {
+            const chunkEvents = await stakingContract.queryFilter(filter, start, end);
+            events.push(...chunkEvents);
+          } catch (chunkErr) {}
+        }
 
         for (const event of events) {
           try {
@@ -165,8 +175,8 @@ export async function getRealUserData(walletAddress: string, provider: any, stak
       level2Count: 0,
       level3Count: 0,
       level4Count: 0,
-      todayUsers: 15,
-      yesterdayUsers: 13,
+      todayUsers: 0,
+      yesterdayUsers: 0,
       directCommission: "0.00",
       matrixIncome: "0.00",
       vaults: [],
