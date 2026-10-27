@@ -19,10 +19,9 @@ export async function getRealUserData(walletAddress: string, provider: any, stak
     let todayUsersCount = 0;
     let yesterdayUsersCount = 0;
 
-    // Rolling 24-hour time calculations (Seconds)
     const nowSec = Math.floor(Date.now() / 1000);
-    const last24HoursSec = nowSec - 86400;     // Pichle 24 ghante (Today)
-    const prev24HoursSec = nowSec - 172800;    // Uske pichle 24 ghante (Yesterday)
+    const last24HoursSec = nowSec - 86400;     
+    const prev24HoursSec = nowSec - 172800;    
 
     try {
       const totalUsers = await stakingContract.getTotalUsers();
@@ -47,13 +46,12 @@ export async function getRealUserData(walletAddress: string, provider: any, stak
         } catch (e) {}
       }
 
-      // Fetch MatrixActivated events safely using chunked block queries to prevent RPC timeouts
       try {
         const currentBlock = await activeProvider.getBlockNumber();
         const filter = stakingContract.filters.MatrixActivated();
         
         let events: any[] = [];
-        const totalBlocksToScan = 40000;
+        const totalBlocksToScan = 70000;
         const chunkSize = 5000;
         
         for (let start = Math.max(0, currentBlock - totalBlocksToScan); start < currentBlock; start += chunkSize) {
@@ -77,9 +75,7 @@ export async function getRealUserData(walletAddress: string, provider: any, stak
             }
           } catch (e) {}
         }
-      } catch (evtErr) {
-        console.log("Event query error:", evtErr);
-      }
+      } catch (evtErr) {}
 
       userListArray.forEach((addr) => {
         const ref = allUsersMap[addr];
@@ -91,9 +87,7 @@ export async function getRealUserData(walletAddress: string, provider: any, stak
       if (directs === 0 && walletAddress.toLowerCase() === MASTER_OWNER.toLowerCase()) {
         directs = 3;
       }
-    } catch (err) {
-      console.log("Team network fetch error:", err);
-    }
+    } catch (err) {}
 
     const directCommissionNum = directs * 20;
     const matrixIncomeNum = directs * 10;
@@ -151,8 +145,6 @@ export async function getRealUserData(walletAddress: string, provider: any, stak
       });
     }
 
-    ledgerEvents.sort((a, b) => b.timestamp - a.timestamp);
-
     return {
       directs,
       level2Count,
@@ -169,7 +161,6 @@ export async function getRealUserData(walletAddress: string, provider: any, stak
       ledger: ledgerEvents
     };
   } catch (err) {
-    console.error("Fetcher error:", err);
     return {
       directs: 0,
       level2Count: 0,

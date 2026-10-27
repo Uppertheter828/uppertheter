@@ -43,7 +43,6 @@ export default function MatrixPlanPage() {
       const currentBlock = await provider.getBlockNumber();
       const filter = contract.filters.MatrixActivated();
       
-      // Poore 48-50 ghante (Yesterday + Today) cover karne ke liye 70,000 blocks scan karenge
       let events: any[] = [];
       const totalBlocksToScan = 70000;
       const chunkSize = 5000;
@@ -57,8 +56,8 @@ export default function MatrixPlanPage() {
       }
 
       const nowSec = Math.floor(Date.now() / 1000);
-      const last24HoursSec = nowSec - 86400;     // Pichle 24 ghante (Today)
-      const prev24HoursSec = nowSec - 172800;    // Uske pichle 24 ghante (Yesterday)
+      const last24HoursSec = nowSec - 86400;     
+      const prev24HoursSec = nowSec - 172800;    
 
       let tCount = 0;
       let yCount = 0;
@@ -132,7 +131,7 @@ export default function MatrixPlanPage() {
               <div style={{ fontSize: "10px", color: "#10b981", fontWeight: "700" }}>Active Today</div>
             </div>
 
-            <div style={{ backgroundColor: "#0d131f", border: "1px solid rgba(16, 185, 129, 0.2)",borderRadius: "20px", padding: "20px", textAlign: "center" }}>
+            <div style={{ backgroundColor: "#0d131f", border: "1px solid rgba(16, 185, 129, 0.2)", borderRadius: "20px", padding: "20px", textAlign: "center" }}>
               <div style={{ fontSize: "11px", color: "#9ca3af", fontWeight: "800", textTransform: "uppercase" }}>Yesterday's Activations</div>
               <div style={{ fontSize: "28px", fontWeight: "900", color: "#ffffff", margin: "8px 0 4px 0" }}>
                 {loadingStats ? "..." : `+${yesterdayActivations}`}
@@ -140,64 +139,6 @@ export default function MatrixPlanPage() {
               <div style={{ fontSize: "10px", color: "#facc15", fontWeight: "700" }}>Previous Day</div>
             </div>
           </div>
-
-          <div style={{
-            backgroundColor: "#0d131f",
-            borderRadius: "24px",
-            padding: "40px 32px",
-            border: "1px solid rgba(16, 185, 129, 0.3)",
-            textAlign: "left",
-            boxShadow: "0 10px 40px rgba(0, 0, 0, 0.6)",
-            marginBottom: "32px"
-          }}>
-            <div style={{ fontSize: "14px", color: "#10b981", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px" }}>Starter Tier</div>
-            <div style={{ fontSize: "48px", fontWeight: "900", color: "#ffffff", margin: "10px 0" }}>$50 <span style={{ fontSize: "16px", color: "#6b7280" }}>USDT</span></div>
-            <p style={{ fontSize: "14px", color: "#9ca3af", marginBottom: "24px", lineHeight: "1.5" }}>
-              Low-barrier entry to test the ecosystem with full access to direct sponsor and pool distributions.
-            </p>
-
-            <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "20px" }}>
-              <div style={{ fontSize: "12px", color: "#6b7280", fontWeight: "800", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                Distribution Breakdown ($50 Fixed):
-              </div>
-              
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "12px" }}>
-                <div style={{ fontSize: "13px", color: "#d1d5db", display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#030712", padding: "12px 16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.04)" }}>
-                  <span style={{ color: "#10b981", fontWeight: "900" }}>✓</span> 40% Direct Sponsor ($20.00 USDT)
-                </div>
-                <div style={{ fontSize: "13px", color: "#d1d5db", display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#030712", padding: "12px 16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.04)" }}>
-                  <span style={{ color: "#10b981", fontWeight: "900" }}>✓</span> 20% Passive Pool ($10.00 USDT)
-                </div>
-                <div style={{ fontSize: "13px", color: "#d1d5db", display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#030712", padding: "12px 16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.04)" }}>
-                  <span style={{ color: "#10b981", fontWeight: "900" }}>✓</span> 20% Reward & Mystery Box ($10.00 USDT)
-                </div>
-                <div style={{ fontSize: "13px", color: "#d1d5db", display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#030712", padding: "12px 16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.04)" }}>
-                  <span style={{ color: "#10b981", fontWeight: "900" }}>✓</span> 15% 3 Level Senior ($7.50 USDT)
-                </div>
-                <div style={{ fontSize: "13px", color: "#d1d5db", display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#030712", padding: "12px 16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.04)" }}>
-                  <span style={{ color: "#10b981", fontWeight: "900" }}>✓</span> 5% Maintenance Fees ($2.50 USDT)
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div style={{
-            backgroundColor: "rgba(16, 185, 129, 0.08)",
-            border: "1px solid rgba(16, 185, 129, 0.4)",
-            borderRadius: "20px",
-            padding: "24px 28px",
-            textAlign: "left",
-            boxShadow: "0 10px 30px rgba(16, 185, 129, 0.1)"
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
-              <span style={{ fontSize: "20px" }}>💡</span>
-              <h3 style={{ fontSize: "16px", fontWeight: "900", color: "#10b981", margin: 0 }}>Important Protocol Note & Passive Switch Rule</h3>
-            </div>
-            <p style={{ fontSize: "13px", color: "#d1d5db", lineHeight: "1.7", margin: 0 }}>
-              If a user activates the $50 tier package but fails to refer at least one direct member or participate in staking within <strong style={{ color: "#ffffff" }}>60 days</strong>, their account/ID will automatically switch into the <strong style={{ color: "#ffffff" }}>Passive Pool</strong>. Starting from the 60th day onwards, their token minting process will initiate, and a total of <strong style={{ color: "#10b981" }}>$60 USDT</strong> will be successfully minted and automatically credited back to their connected wallet over a period of <strong style={{ color: "#ffffff" }}>150 days</strong>[cite: 13].
-            </p>
-          </div>
-
         </div>
       </section>
     </div>
