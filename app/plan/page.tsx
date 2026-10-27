@@ -201,5 +201,4 @@ export default function MatrixPlanPage() {
         </div>
       </section>
     </div>
-  );
-}
+  )
