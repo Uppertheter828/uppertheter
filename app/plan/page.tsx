@@ -41,14 +41,26 @@ export default function MatrixPlanPage() {
       }
 
       const currentBlock = await provider.getBlockNumber();
-      const fromBlock = Math.max(0, currentBlock - 500000);
-
       const filter = contract.filters.MatrixActivated();
-      const events = await contract.queryFilter(filter, fromBlock, "latest");
+      
+      // Public RPC limits se bachne ke liye pichle 40,000 blocks ko 5,000 ke chunks mein query karenge
+      let events: any[] = [];
+      const totalBlocksToScan = 40000;
+      const chunkSize = 5000;
+      
+      for (let start = Math.max(0, currentBlock - totalBlocksToScan); start < currentBlock; start += chunkSize) {
+        const end = Math.min(start + chunkSize, currentBlock);
+        try {
+          const chunkEvents = await contract.queryFilter(filter, start, end);
+          events.push(...chunkEvents);
+        } catch (chunkErr) {
+          console.log(`Chunk error between ${start} and ${end}:`, chunkErr);
+        }
+      }
 
       const nowSec = Math.floor(Date.now() / 1000);
-      const last24HoursSec = nowSec - 86400;     
-      const prev24HoursSec = nowSec - 172800;    
+      const last24HoursSec = nowSec - 86400;     // Pichle 24 ghante (Today)
+      const prev24HoursSec = nowSec - 172800;    // Uske pichle 24 ghante (Yesterday)
 
       let tCount = 0;
       let yCount = 0;
@@ -184,7 +196,7 @@ export default function MatrixPlanPage() {
               <h3 style={{ fontSize: "16px", fontWeight: "900", color: "#10b981", margin: 0 }}>Important Protocol Note & Passive Switch Rule</h3>
             </div>
             <p style={{ fontSize: "13px", color: "#d1d5db", lineHeight: "1.7", margin: 0 }}>
-              If a user activates the $50 tier package but fails to refer at least one direct member or participate in staking within <strong style={{ color: "#ffffff" }}>60 days</strong>, their account/ID will automatically switch into the <strong style={{ color: "#ffffff" }}>Passive Pool</strong>. Starting from the 60th day onwards, their token minting process will initiate, and a total of <strong style={{ color: "#10b981" }}>$60 USDT</strong> will be successfully minted and automatically credited back to their connected wallet over a period of <strong style={{ color: "#ffffff" }}>150 days</strong>.
+              If a user activates the $50 tier package but fails to refer at least one direct member or participate in staking within <strong style={{ color: "#ffffff" }}>60 days</strong>, their account/ID will automatically switch into the <strong style={{ color: "#ffffff" }}>Passive Pool</strong>. Starting from the 60th day onwards, their token minting process will initiate, and a total of <strong style={{ color: "#10b981" }}>$60 USDT</strong> will be successfully minted and automatically credited back to their connected wallet over a period of <strong style={{ color: "#ffffff" }}>150 days</strong>[cite: 13].
             </p>
           </div>
 
