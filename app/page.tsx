@@ -555,7 +555,9 @@ export default function HomePage() {
 
                   <div style={{ backgroundColor: "#030712", padding: "16px", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.05)", textAlign: "center", marginBottom: "24px" }}>
                     <div style={{ fontSize: "11px", color: "#9ca3af", textTransform: "uppercase", letterSpacing: "1px" }}>Estimated Return</div>
-                    <div style={{ fontSize: "28px", fontWeight: "900", color: "#10b981", marginTop: "4px" }}>{vault.roi}</div>
+                    <div style={{ fontSize: "28px", fontWeight: "900", color: "#10b981", marginTop: "4px" }}>
+                      {vault.days === "90-Day" ? "18% - 22% ROI" : vault.days === "180-Day" ? "40% - 44% ROI" : vault.days === "365-Day" ? "90% - 94% ROI" : vault.roi}
+                    </div>
                   </div>
                 </div>
 
