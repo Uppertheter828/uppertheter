@@ -734,18 +734,12 @@ export default function HomePage() {
       </section>
 
       {/* CORPORATE & CEO INFO SECTION */}
-      <section style={{ padding: "40px 16px", backgroundColor: "#060911", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-        <div style={{ maxWidth: "1140px", margin: "0 auto", display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "24px" }}>
-          <div>
-            <div style={{ fontSize: "12px", fontWeight: "800", color: "#10b981", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>Chief Executive Officer</div>
-            <div style={{ fontSize: "18px", fontWeight: "900", color: "#ffffff" }}>David Henry</div>
-          </div>
-          <div>
-            <div style={{ fontSize: "12px", fontWeight: "800", color: "#06b6d4", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>Global Corporate Headquarters</div>
-            <div style={{ fontSize: "14px", fontWeight: "700", color: "#d1d5db" }}>140 Broadway, New York, NY 10005, USA</div>
-          </div>
-        </div>
-      </section>
+<section style={{ padding: "40px 16px", backgroundColor: "#0b0911", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+  <div style={{ maxWidth: "1140px", margin: "0 auto", textAlign: "center" }}>
+    <div style={{ fontSize: "12px", fontWeight: "800", color: "#9ca3af", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>Global Corporate Headquarters</div>
+    <div style={{ fontSize: "14px", fontWeight: "700", color: "#d1d5db" }}>140 Broadway, New York, NY 10005, USA</div>
+  </div>
+</section>
 
       {/* FOOTER SECTION */}
       <footer style={{ padding: "40px 16px", backgroundColor: "#030712", borderTop: "1px solid rgba(255,255,255,0.08)", textAlign: "center", fontSize: "13px", color: "#6b7280" }}>
