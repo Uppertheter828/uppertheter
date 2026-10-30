@@ -6,13 +6,11 @@ import { ethers } from "ethers";
 
 const CONTRACT_ADDRESS = "0x2763371176919176e28EC6B92bAc01875b9Bb2F3";
 const CONTRACT_ABI = [
-  "function getTotalUsers() external view returns (uint256)",
-  "event MatrixActivated(address indexed user, address indexed referrer)"
+  "function getTotalUsers() external view returns (uint256)"
 ];
 
 export default function MatrixPlanPage() {
   const [totalUsers, setTotalUsers] = useState<number>(0);
-  const [todayActivations, setTodayActivations] = useState<number>(0);
   const [loadingStats, setLoadingStats] = useState<boolean>(true);
 
   useEffect(() => {
@@ -31,41 +29,9 @@ export default function MatrixPlanPage() {
       const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
       
       const total = await contract.getTotalUsers();
-      const totalNum = Number(total);
-      setTotalUsers(totalNum);
-
-      if (totalNum === 0) {
-        setLoadingStats(false);
-        return;
-      }
-
-      const currentBlock = await provider.getBlockNumber();
-      const fromBlock = Math.max(0, currentBlock - 400000);
-
-      const filter = contract.filters.MatrixActivated();
-      const events = await contract.queryFilter(filter, fromBlock, "latest");
-
-      const nowSec = Math.floor(Date.now() / 1000);
-      const startOfTodaySec = nowSec - (nowSec % 86400); // Aaj raat 12:00 AM
-
-      let tCount = 0;
-
-      for (const event of events) {
-        try {
-          const block = await provider.getBlock(event.blockNumber);
-          if (block && block.timestamp) {
-            const ts = Number(block.timestamp);
-            if (ts >= startOfTodaySec) {
-              tCount++;
-            }
-          }
-        } catch (e) {}
-      }
-
-      setTodayActivations(tCount);
+      setTotalUsers(Number(total));
     } catch (err) {
       console.error("Error fetching blockchain data:", err);
-      setTodayActivations(0);
     } finally {
       setLoadingStats(false);
     }
@@ -100,21 +66,13 @@ export default function MatrixPlanPage() {
             Explore how the Uppertheter Protocol securely splits every $50 USDT tier activation instantly on-chain with zero admin retention.
           </p>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px", marginBottom: "32px" }}>
-            <div style={{ backgroundColor: "#0d131f", border: "1px solid rgba(16, 185, 129, 0.2)", borderRadius: "20px", padding: "20px", textAlign: "center" }}>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: "32px" }}>
+            <div style={{ backgroundColor: "#0d131f", border: "1px solid rgba(16, 185, 129, 0.2)", borderRadius: "20px", padding: "20px", textAlign: "center", minWidth: "260px" }}>
               <div style={{ fontSize: "11px", color: "#9ca3af", fontWeight: "800", textTransform: "uppercase" }}>Total Registered Users</div>
               <div style={{ fontSize: "28px", fontWeight: "900", color: "#10b981", margin: "8px 0 4px 0" }}>
                 {loadingStats ? "..." : totalUsers}
               </div>
               <div style={{ fontSize: "10px", color: "#38bdf8", fontWeight: "700" }}>Verified On-Chain</div>
-            </div>
-
-            <div style={{ backgroundColor: "#0d131f", border: "1px solid rgba(16, 185, 129, 0.2)", borderRadius: "20px", padding: "20px", textAlign: "center" }}>
-              <div style={{ fontSize: "11px", color: "#9ca3af", fontWeight: "800", textTransform: "uppercase" }}>Today's Activations</div>
-              <div style={{ fontSize: "28px", fontWeight: "900", color: "#ffffff", margin: "8px 0 4px 0" }}>
-                {loadingStats ? "..." : `+${todayActivations}`}
-              </div>
-              <div style={{ fontSize: "10px", color: "#10b981", fontWeight: "700" }}>Active Today</div>
             </div>
           </div>
 
@@ -151,7 +109,7 @@ export default function MatrixPlanPage() {
                 <div style={{ fontSize: "13px", color: "#d1d5db", display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#030712", padding: "12px 16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.04)" }}>
                   <span style={{ color: "#10b981", fontWeight: "900" }}>✓</span> 15% 3 Level Senior ($7.50 USDT)
                 </div>
-                <div style={{ fontSize: "13px", color: "#10b981", fontWeight: "900", display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#030712", padding: "12px 16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.04)" }}>
+                <div style={{ fontSize: "13px", color: "#d1d5db", display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#030712", padding: "12px 16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.04)" }}>
                   <span style={{ color: "#10b981", fontWeight: "900" }}>✓</span> 5% Maintenance Fees ($2.50 USDT)
                 </div>
               </div>
