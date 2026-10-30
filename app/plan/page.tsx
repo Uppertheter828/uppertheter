@@ -116,6 +116,23 @@ export default function MatrixPlanPage() {
             </div>
           </div>
 
+          <div style={{
+            backgroundColor: "rgba(16, 185, 129, 0.08)",
+            border: "1px solid rgba(16, 185, 129, 0.4)",
+            borderRadius: "20px",
+            padding: "24px 28px",
+            textAlign: "left",
+            boxShadow: "0 10px 30px rgba(16, 185, 129, 0.1)"
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
+              <span style={{ fontSize: "20px" }}>💡</span>
+              <h3 style={{ fontSize: "16px", fontWeight: "900", color: "#10b981", margin: 0 }}>Important Protocol Note & Passive Switch Rule</h3>
+            </div>
+            <p style={{ fontSize: "13px", color: "#d1d5db", lineHeight: "1.7", margin: 0 }}>
+              If a user activates the $50 tier package via Matrix but fails to refer at least one direct member or participate in staking within <strong style={{ color: "#ffffff" }}>60 days</strong>, their account/ID will automatically switch into the <strong style={{ color: "#ffffff" }}>Passive Pool</strong>. Starting from the 60th day onwards, their token minting process will initiate, and a total of <strong style={{ color: "#10b981" }}>$60 USDT</strong> will be successfully minted and automatically credited back to their connected wallet over a period of <strong style={{ color: "#ffffff" }}>150 days</strong>.
+            </p>
+          </div>
+
         </div>
       </section>
     </div>
